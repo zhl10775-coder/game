@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>指尖扩张 - 试玩版</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="resource-bar">
+        <div class="resource-item">
+          <span class="resource-icon gold"></span>
+          <span class="resource-value" id="gold-value">1200</span>
+        </div>
+        <div class="resource-item">
+          <span class="resource-icon gem"></span>
+          <span class="resource-value" id="gem-value">50</span>
+        </div>
+        <div class="resource-item">
+          <span class="resource-icon energy"></span>
+          <span class="resource-value" id="energy-value">50</span>
+        </div>
+        <div class="status-pill" id="status-pill">战斗准备中</div>
+      </header>
+
+      <main class="battlefield">
+        <section class="battle-info">
+          <div>
+            <strong id="mode-label">PVP 房间</strong>
+            <p id="mode-detail">2人 · 房间号 897654</p>
+          </div>
+          <div class="battle-actions">
+            <button class="action-button" id="switch-map">切换人数</button>
+            <button class="action-button primary" id="start-attack">发起进攻</button>
+          </div>
+        </section>
+
+        <div class="map" id="map">
+          <svg class="map-lines" viewBox="0 0 100 100" aria-hidden="true" id="map-lines"></svg>
+          <div class="map-nodes" id="map-nodes"></div>
+          <div class="map-hint" id="map-hint">轻触己方节点再点击相邻区域进行扩张</div>
+        </div>
+
+        <aside class="skill-bar">
+          <button class="skill-button">空降</button>
+          <button class="skill-button">保护</button>
+          <button class="skill-button">提速</button>
+        </aside>
+      </main>
+
+      <nav class="bottom-nav">
+        <button class="nav-item" data-panel="upgrade">升级</button>
+        <button class="nav-item" data-panel="skills">技能</button>
+        <button class="nav-item active" data-panel="battle">战斗</button>
+        <button class="nav-item" data-panel="info">信息</button>
+      </nav>
+    </div>
+
+    <div class="modal hidden" id="pvp-modal">
+      <div class="modal-content">
+        <button class="modal-close" data-close="pvp-modal">×</button>
+        <h2>PVP对战</h2>
+        <div class="modal-actions">
+          <button class="action-button primary" data-open="matchmaking">匹配对手</button>
+          <button class="action-button success" data-open="create-room">创建房间</button>
+          <button class="action-button secondary" data-open="join-room">加入房间</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel hidden" id="upgrade-panel">
+      <header class="panel-header">
+        <h3>升级面板</h3>
+        <button class="panel-close absolute" data-close="upgrade-panel">×</button>
+      </header>
+      <div class="panel-body">
+        <div class="panel-item">
+          <div>
+            <strong>初始兵力</strong>
+            <p>50 → 51</p>
+          </div>
+          <button class="action-button success">升级 1.95K</button>
+        </div>
+        <div class="panel-item">
+          <div>
+            <strong>生成速度</strong>
+            <p>3/秒 → 3.07/秒</p>
+          </div>
+          <button class="action-button success">升级 2.20K</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel hidden" id="skills-panel">
+      <header class="panel-header">
+        <h3>技能面板</h3>
+        <button class="panel-close absolute" data-close="skills-panel">×</button>
+      </header>
+      <div class="panel-body">
+        <div class="panel-item">
+          <div>
+            <strong>空降小兵</strong>
+            <p>剩余次数：PVE 3 / PVP 1</p>
+          </div>
+          <button class="action-button success">释放</button>
+        </div>
+        <div class="panel-item">
+          <div>
+            <strong>保护基地</strong>
+            <p>持续 3 秒</p>
+          </div>
+          <button class="action-button success">释放</button>
+        </div>
+        <div class="panel-item">
+          <div>
+            <strong>士兵提速</strong>
+            <p>移动速度 +20%</p>
+          </div>
+          <button class="action-button success">释放</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel hidden" id="info-panel">
+      <header class="panel-header">
+        <h3>游戏说明</h3>
+        <button class="panel-close absolute" data-close="info-panel">×</button>
+      </header>
+      <div class="panel-body">
+        <p>指尖扩张核心玩法：从核心基地出发，逐步占领相邻区域，扩张领土。</p>
+        <ul>
+          <li>轻触己方区域，再点击相邻区域发起进攻。</li>
+          <li>中立资源节点可提升兵力生成速度。</li>
+          <li>PVP房间支持创建/加入/管理/权限转移。</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel hidden" id="matchmaking">
+      <header class="panel-header">
+        <h3>匹配池</h3>
+        <button class="panel-close absolute" data-close="matchmaking">×</button>
+      </header>
+      <div class="panel-body">
+        <div class="matchmaking-status">
+          <h4>匹配中...</h4>
+          <p id="matchmaking-text">1/4</p>
+          <div class="progress">
+            <div class="progress-bar" id="matchmaking-bar" style="width: 25%;"></div>
+          </div>
+          <div class="matchmaking-dots">
+            <span class="dot active"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+          <p class="matchmaking-tip">满4人立即开战，等待≥60秒且≥2人自动开战</p>
+        </div>
+        <button class="action-button danger" data-close="matchmaking">取消匹配</button>
+      </div>
+    </div>
+
+    <div class="panel hidden" id="create-room">
+      <header class="panel-header">
+        <h3>创建PVP房间</h3>
+        <button class="panel-close absolute" data-close="create-room">×</button>
+      </header>
+      <div class="panel-body">
+        <label class="field">
+          <span>房间名称</span>
+          <input type="text" id="room-name" placeholder="请输入2-10字（如好友对战1局）" />
+        </label>
+        <label class="field">
+          <span>房间号码（邀请码）</span>
+          <div class="field-inline">
+            <input type="text" id="room-code" value="897654" readonly />
+            <button class="action-button" id="copy-room">复制</button>
+          </div>
+        </label>
+        <label class="field checkbox">
+          <input type="checkbox" id="room-password-toggle" />
+          <span>设置房间密码（防止陌生人加入）</span>
+        </label>
+        <label class="field hidden" id="room-password-field">
+          <span>房间密码</span>
+          <input type="password" id="room-password" placeholder="请输入4-6位数字密码" />
+        </label>
+        <div class="panel-actions">
+          <button class="action-button success" id="confirm-create">确认创建</button>
+          <button class="action-button danger" data-close="create-room">取消</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel hidden" id="join-room">
+      <header class="panel-header">
+        <h3>加入PVP房间</h3>
+        <button class="panel-close absolute" data-close="join-room">×</button>
+      </header>
+      <div class="panel-body">
+        <div class="panel-item">
+          <label class="field">
+            <span>房间号码</span>
+            <div class="field-inline">
+              <input type="text" id="quick-code" placeholder="请输入6位房间号码" />
+              <button class="action-button primary" id="quick-join">加入</button>
+            </div>
+          </label>
+          <button class="action-button secondary">扫描邀请码</button>
+        </div>
+        <div class="list" id="room-list"></div>
+        <button class="action-button danger" data-close="join-room">返回</button>
+      </div>
+    </div>
+
+    <div class="modal hidden" id="password-modal">
+      <div class="modal-content compact">
+        <button class="modal-close" data-close="password-modal">×</button>
+        <h3>请输入房间密码</h3>
+        <label class="field">
+          <span>密码</span>
+          <input type="password" id="join-password" placeholder="请输入4-6位数字密码" />
+        </label>
+        <div class="panel-actions">
+          <button class="action-button success" id="confirm-password">确认</button>
+          <button class="action-button danger" data-close="password-modal">取消</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel hidden" id="room-lobby">
+      <header class="panel-header">
+        <div class="room-info">
+          <button class="panel-close" data-close="room-lobby">←</button>
+          <div>
+            <strong id="lobby-name">好友对战1局</strong>
+            <p id="lobby-code">房间号：897654 🔒</p>
+          </div>
+        </div>
+        <span class="status-pill" id="host-transfer" hidden>你已成为房主</span>
+      </header>
+      <div class="panel-body">
+        <div class="countdown" id="countdown" hidden>
+          <span>开战倒计时</span>
+          <strong id="countdown-value">3</strong>
+        </div>
+        <div class="player-list" id="player-list"></div>
+        <div class="panel-actions">
+          <button class="action-button" id="toggle-ready">准备</button>
+          <button class="action-button success" id="start-battle">发起开战</button>
+          <button class="action-button danger" id="leave-room">退出房间</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast" hidden></div>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
